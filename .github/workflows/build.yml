@@ -1,0 +1,46 @@
+name: Build xsty mod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'zulu'
+
+    - name: Install Tools
+      run: |
+        mkdir -p tools
+        wget https://github.com -O tools/apktool.jar
+        wget https://github.com -O tools/signer.jar
+
+    - name: Download Clean TikTok 32.5.3
+      run: |
+        wget "https://github.com" -O base.apk
+
+    - name: Patch Application Resources
+      run: |
+        java -jar tools/apktool.jar d base.apk -o source
+        sed -i 's/>TikTok</>xsty mod</g' source/res/values/strings.xml
+        echo '<string name="xsty_dev">Main Dev: Razil Zakirov (zakirovazila10-cpu)</string>' >> source/res/values/strings.xml
+        sed -i 's/name="main_bottom_navigation_background">@color.*/name="main_bottom_navigation_background">#FF000000/g' source/res/values/colors.xml
+
+    - name: Compile and Sign APK
+      run: |
+        java -jar tools/apktool.jar b source -o xsty_mod_unsigned.apk
+        java -jar tools/signer.jar --apks xsty_mod_unsigned.apk --out output
+
+    - name: Upload Finished Mod
+      uses: actions/upload-artifact@v4
+      with:
+        name: xsty-mod-ready
+        path: output/*.apk
