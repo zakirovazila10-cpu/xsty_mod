@@ -25,7 +25,8 @@ jobs:
 
     - name: Download Clean TikTok 32.5.3
       run: |
-        wget "https://github.com" -O base.apk
+        # Новая рабочая прямая ссылка на чистый оригинальный APK
+        wget "https://r2.dev" -O base.apk
 
     - name: Patch Application Resources
       run: |
